@@ -2,7 +2,7 @@
   "name": "💰 Finanças Mobile",
   "short_name": "Finanças",
   "description": "App de controle financeiro pessoal simplificado.",
-  "start_url": "./index.html",
+  "start_url": "index.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#121212",
