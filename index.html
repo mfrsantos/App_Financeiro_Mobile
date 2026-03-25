@@ -3,8 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>App Financeiro Mobile v1.7.1</title>
+  <title>App Financeiro Mobile v1.7.2</title>
   
+  <link rel="manifest" href="manifest.json?v=1.0">
+  <meta name="theme-color" content="#3b82f6">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="icon" type="image/png" href="icon-192.png">
+
   <style>
     * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; touch-action: manipulation; }
     body { 
@@ -44,7 +51,6 @@
     th { background: #333; color: #3b82f6; font-size: 0.65rem; text-transform: uppercase; padding: 10px 6px; text-align: left; }
     td { padding: 8px 6px; border-bottom: 1px solid #333; text-align: left; font-size: 0.8rem; white-space: nowrap; }
     
-    /* Larguras fixas para tentar manter o alinhamento visual */
     .col-valor { width: 105px; text-align: right; }
     .col-acao { width: 45px; text-align: center; }
     .col-pago { width: 40px; text-align: center; }
@@ -59,13 +65,9 @@
     }
     .modal-content {
       background: #2a2a2a; padding: 25px; border-radius: 15px; width: 100%; max-width: 400px;
-      text-align: center; border: 1px solid #444; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      text-align: center; border: 1px solid #444;
     }
     .modal-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-    .btn-cred { background: #f59e0b !important; }
-    .btn-deb { background: #10b981 !important; }
-    .btn-cancel { background: #444; margin-top: 10px; width: 100%; }
-    input[type="date"] { color-scheme: dark; }
   </style>
 </head>
 <body>
@@ -161,14 +163,21 @@
       <h3>Meio de Pagamento</h3>
       <p>Como deseja pagar esta conta?</p>
       <div class="modal-btns">
-        <button class="btn-cred" onclick="processarEscolha('credito')">💳 CRÉDITO</button>
-        <button class="btn-deb" onclick="processarEscolha('debito')">💰 DÉBITO</button>
+        <button style="background: #f59e0b;" onclick="processarEscolha('credito')">💳 CRÉDITO</button>
+        <button style="background: #10b981;" onclick="processarEscolha('debito')">💰 DÉBITO</button>
       </div>
-      <button class="btn-cancel" onclick="fecharModal()">CANCELAR</button>
+      <button style="background: #444; width: 100%; margin-top: 10px;" onclick="fecharModal()">CANCELAR</button>
     </div>
   </div>
 
   <script>
+    // Registro do Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js')
+        .then(() => console.log('Service Worker registrado!'))
+        .catch(err => console.log('Erro no SW:', err));
+    }
+
     const STORAGE_KEY = "App_Financeiro_Mobile_Data";
     let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || inicializar();
     let itemSelecionadoIdx = null;
