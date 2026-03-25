@@ -1,9 +1,8 @@
-const CACHE_NAME = 'controle-financeiro-v1';
-// Lista de arquivos com o caminho do repositório
+const CACHE_NAME = 'app-financeiro-mobile-v1';
 const ASSETS = [
-  '/App_Financeiro/',
-  '/App_Financeiro/index.html',
-  '/App_Financeiro/manifest.json'
+  '/App_Financeiro_Mobile/',
+  '/App_Financeiro_Mobile/index.html',
+  '/App_Financeiro_Mobile/manifest.json'
 ];
 
 self.addEventListener('install', (e) => {
