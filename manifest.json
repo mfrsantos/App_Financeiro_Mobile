@@ -1,17 +1,35 @@
 {
-  "short_name": "Finanças Mob",
-  "name": "App Financeiro Mobile",
+  "name": "💰 Finanças Mobile",
+  "short_name": "Finanças",
+  "description": "App de controle financeiro pessoal simplificado.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#3b82f6",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2343/2343101.png",
+      "src": "./icon-192.png",
+      "sizes": "192x192",
       "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./icon-512.png",
       "sizes": "512x512",
-      "purpose": "any maskable"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
-  ],
-  "start_url": "/App_Financeiro_Mobile/index.html",
-  "background_color": "#121212",
-  "display": "standalone",
-  "scope": "/App_Financeiro_Mobile/",
-  "theme_color": "#121212"
+  ]
 }
