@@ -1,4 +1,4 @@
-const CACHE_NAME = 'finance-app-v1.7.4'; // Versão atualizada para identificação dos gastos variaveis
+const CACHE_NAME = 'finance-app-v1.7.4';
 const ASSETS = [
   './',
   './index.html',
@@ -7,30 +7,37 @@ const ASSETS = [
   './icon-512.png'
 ];
 
-// Instalação do Service Worker
+// 1. Instalação: Força o cache de todos os recursos essenciais
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      // Tenta cachear os recursos, ignorando falhas individuais se algum ícone ainda não existir
-      return cache.addAll(ASSETS).catch(err => console.log("Aguardando upload dos ícones...", err));
+      console.log('SW: Cacheando arquivos essenciais para instalação');
+      return cache.addAll(ASSETS);
     })
   );
   self.skipWaiting();
 });
 
-// Ativação e limpeza de caches antigos (Remove a v1.7.1)
+// 2. Ativação: Limpa caches antigos imediatamente
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
-        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            console.log('SW: Removendo cache antigo:', key);
+            return caches.delete(key);
+          }
+        })
       );
     })
   );
-  self.clients.claim();
+  return self.clients.claim();
 });
 
-// Estratégia Fetch
+// 3. Estratégia Fetch: Network-First com Fallback para Cache
+// Isso garante que o app use o código novo se houver internet, 
+// mas não quebre se estiver offline (essencial para o botão de instalação)
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(event.request).catch(() => {
