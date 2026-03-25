@@ -1,0 +1,17 @@
+{
+  "short_name": "Finanças",
+  "name": "Controle Financeiro",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2343/2343101.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/App_Financeiro/index.html",
+  "background_color": "#121212",
+  "display": "standalone",
+  "scope": "/App_Financeiro/",
+  "theme_color": "#1e1e1e"
+}
