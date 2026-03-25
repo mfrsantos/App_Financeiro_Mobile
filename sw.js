@@ -1,45 +1,40 @@
-// Versão do Cache - Altere este número (ex: v1.1, v1.2) toda vez que subir código novo
-const CACHE_NAME = 'financeiro-app-v1.1';
+const CACHE_NAME = 'finance-app-v1.7.2'; // Versão atualizada para forçar o novo ícone
 const ASSETS = [
-  '/App_Financeiro_Mobile/',
-  '/App_Financeiro_Mobile/index.html',
-  '/App_Financeiro_Mobile/manifest.json',
-  // Adicione aqui outros arquivos como ícones se houver, ex: 'icon.png'
+  './',
+  './index.html',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png'
 ];
 
-// Instalação: Salva os arquivos no cache
+// Instalação do Service Worker
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('Cache aberto!');
-      return cache.addAll(ASSETS);
+      // Tenta cachear os recursos, ignorando falhas individuais se algum ícone ainda não existir
+      return cache.addAll(ASSETS).catch(err => console.log("Aguardando upload dos ícones...", err));
     })
   );
-  self.skipWaiting(); // Força o novo Service Worker a assumir o controle imediatamente
+  self.skipWaiting();
 });
 
-// Ativação: Limpa caches antigos
+// Ativação e limpeza de caches antigos (Remove a v1.7.1)
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
+    caches.keys().then((keys) => {
       return Promise.all(
-        cacheNames.map((cache) => {
-          if (cache !== CACHE_NAME) {
-            console.log('Limpando cache antigo...', cache);
-            return caches.delete(cache);
-          }
-        })
+        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
       );
     })
   );
-  return self.clients.claim();
+  self.clients.claim();
 });
 
-// Busca: Tenta o cache primeiro, se não tiver, vai na rede
+// Estratégia Fetch
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
+    fetch(event.request).catch(() => {
+      return caches.match(event.request);
     })
   );
 });
