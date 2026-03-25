@@ -1,4 +1,4 @@
-const CACHE_NAME = 'finance-app-v1.7.2'; // Versão atualizada para forçar o novo ícone
+const CACHE_NAME = 'finance-app-v1.7.4'; // Versão atualizada para identificação dos gastos variaveis
 const ASSETS = [
   './',
   './index.html',
