@@ -9,84 +9,37 @@
   <meta name="theme-color" content="#121212">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <div id="install-area" style="display:none; padding: 15px; background: #3b82f6; border-radius: 12px; margin-bottom: 20px; text-align: center;">
-  <p style="margin: 0 0 10px 0; font-weight: bold;">Instale o App na sua tela inicial!</p>
-  <button id="btn-install" style="background: #ffffff; color: #3b82f6; width: 100%;">INSTALAR AGORA</button>
-</div>
 
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/App_Financeiro_Mobile/sw.js', { scope: '/App_Financeiro_Mobile/' })
-        .then(() => console.log("App Financeiro Mobile: PWA Ativo"))
+        .then(() => console.log("PWA Ativo"))
         .catch((err) => console.log("Erro PWA:", err));
     }
-    // --- LÓGICA DE INSTALAÇÃO SIMPLIFICADA ---
-let deferredPrompt;
-const installArea = document.getElementById('install-area');
-const btnInstall = document.getElementById('btn-install');
-
-window.addEventListener('beforeinstallprompt', (e) => {
-  // Impede o Chrome de mostrar o aviso padrão chato
-  e.preventDefault();
-  // Guarda o evento para disparar quando o usuário clicar no nosso botão
-  deferredPrompt = e;
-  // Mostra o nosso banner bonito de instalação
-  installArea.style.display = 'block';
-
-  btnInstall.addEventListener('click', () => {
-    // Esconde o nosso banner
-    installArea.style.display = 'none';
-    // Abre a janelinha oficial de instalação do Android
-    deferredPrompt.prompt();
-    
-    deferredPrompt.userChoice.then((choiceResult) => {
-      if (choiceResult.outcome === 'accepted') {
-        console.log('O usuário aceitou instalar o App Financeiro');
-      }
-      deferredPrompt = null;
-    });
-  });
-});
-
-// Se o app já estiver instalado, ele nem mostra o botão
-window.addEventListener('appinstalled', () => {
-  installArea.style.display = 'none';
-});
   </script>
 
   <style>
-    /* Estilos Otimizados para Mobile (Realme C75) e Tablet */
     * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; touch-action: manipulation; }
-    
     body { 
       margin: 0; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0; 
       background: #121212; color: #e0e0e0; -webkit-tap-highlight-color: transparent; 
     }
-    
     .container { max-width: 1300px; margin: 0 auto; padding: 15px; background: #1e1e1e; min-height: 100vh; }
-    
     header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 10px; flex-wrap: wrap; }
     h1 { font-size: 1.2rem; margin: 0; color: #3b82f6; }
-
-    /* Botões e Inputs amigáveis ao toque (48px) */
-    button, input, select { 
-      min-height: 48px; 
-      padding: 10px; 
-      border-radius: 10px; 
-      border: 1px solid #444; 
-      background: #333; 
-      color: #fff; 
-      font-size: 1rem; 
-    }
     
+    /* Botão de Instalação Rápida */
+    #install-area { display:none; padding: 15px; background: #3b82f6; border-radius: 12px; margin-bottom: 20px; text-align: center; border: 2px solid #fff; }
+    #install-area p { margin: 0 0 10px 0; font-weight: bold; color: white; }
+
+    button, input, select { min-height: 48px; padding: 10px; border-radius: 10px; border: 1px solid #444; background: #333; color: #fff; font-size: 1rem; }
     button { background: #3b82f6; font-weight: 600; border: none; cursor: pointer; }
     button:active { transform: scale(0.98); opacity: 0.9; }
 
     .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
     .card { padding: 15px; border-radius: 12px; background: #2a2a2a; border-left: 5px solid #3b82f6; }
-    .card h2 { margin: 0 0 5px; font-size: 0.7rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; }
+    .card h2 { margin: 0 0 5px; font-size: 0.7rem; color: #9ca3af; text-transform: uppercase; }
     .card p { margin: 0; font-size: 1.2rem; font-weight: 800; }
-
     .card-receita-total { border-left-color: #facc15; } .card-receita-total p { color: #facc15; }
     .card-adiantamento { border-left-color: #3b82f6; } .card-adiantamento p { color: #60a5fa; }
     .card-salario { border-left-color: #10b981; } .card-salario p { color: #34d399; }
@@ -95,21 +48,21 @@ window.addEventListener('appinstalled', () => {
 
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     @media (max-width: 1024px) { .grid { grid-template-columns: 1fr; } }
-    
     .table-container { width: 100%; overflow-x: auto; border-radius: 10px; background: #242424; }
     table { width: 100%; border-collapse: collapse; }
     th, td { padding: 12px; border-bottom: 1px solid #333; text-align: left; font-size: 0.9rem; }
-    
     .btn-remover { background: #ef4444; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 8px; }
-    
-    .area-antecipacao { background: #2a2a2a; padding: 15px; border-radius: 12px; border: 1px solid #f59e0b; margin-top: 20px; }
     .input-tabela { width: 90px; background: transparent; border: 1px solid #444; text-align: right; }
-
     input[type="date"] { color-scheme: dark; }
   </style>
 </head>
 <body>
   <div class="container">
+    <div id="install-area">
+      <p>✨ Instale o App no seu telemóvel!</p>
+      <button id="btn-install" style="background: #ffffff; color: #3b82f6; width: 100%;">BAIXAR AGORA</button>
+    </div>
+
     <header>
       <h1>💰 App Financeiro Mobile</h1>
       <div style="display: flex; gap: 8px;">
@@ -136,56 +89,209 @@ window.addEventListener('appinstalled', () => {
     <div class="grid">
       <div class="secao">
         <h3>💵 Receitas</h3>
-        <button onclick="addReceita()" style="width: 100%; margin-bottom: 10px;">+ Adicionar Receita</button>
-        <div class="table-container">
-            <table><tbody id="tabela-receitas"></tbody></table>
-        </div>
+        <button onclick="addReceita()" style="width: 100%; margin-bottom: 10px;">+ Receita</button>
+        <div class="table-container"><table><tbody id="tabela-receitas"></tbody></table></div>
       </div>
-
       <div class="secao">
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
           <h3>📋 Fixas</h3>
-          <button onclick="replicarFixas()" style="background: #8b5cf6; font-size: 0.8rem; min-height: 40px;">🔄 Replicar Meses</button>
+          <button onclick="replicarFixas()" style="background: #8b5cf6; font-size: 0.8rem; min-height: 40px;">🔄 Replicar</button>
         </div>
-        <button onclick="addDespesaFixa()" style="width: 100%; margin: 10px 0;">+ Adicionar Fixa</button>
-        <div class="table-container">
-            <table><tbody id="tabela-fixas"></tbody></table>
-        </div>
+        <button onclick="addDespesaFixa()" style="width: 100%; margin: 10px 0;">+ Fixa</button>
+        <div class="table-container"><table><tbody id="tabela-fixas"></tbody></table></div>
       </div>
     </div>
 
-    <section class="area-antecipacao">
-      <h3>💳 Pagamento de Fatura</h3>
+    <section style="background: #2a2a2a; padding: 15px; border-radius: 12px; border: 1px solid #f59e0b; margin-top: 20px;">
+      <h3>💳 Pagar Fatura</h3>
       <div style="display: flex; flex-direction: column; gap: 10px;">
         <input type="date" id="ant-data">
         <input type="number" id="ant-valor" inputmode="decimal" step="0.01" placeholder="Valor R$">
-        <button onclick="registrarPagamentoFatura()" style="background: #10b981;">Confirmar Pagamento</button>
+        <button onclick="registrarPagamentoFatura()" style="background: #10b981;">Confirmar</button>
       </div>
       <p id="total-antecipado-exibicao" style="text-align: right; color: #10b981; font-weight: bold; margin-top: 10px;"></p>
     </section>
 
     <section style="margin-top: 25px; padding-bottom: 50px;">
-      <h3>🛒 Despesas Variáveis</h3>
+      <h3>🛒 Variáveis</h3>
       <div style="background: #2a2a2a; padding: 15px; border-radius: 12px; display: flex; flex-direction: column; gap: 10px; border: 1px solid #444;">
         <input type="date" id="var-data">
-        <input type="text" id="var-desc" placeholder="Descrição da compra">
+        <input type="text" id="var-desc" placeholder="O que comprou?">
         <input type="number" id="var-valor" inputmode="decimal" step="0.01" placeholder="R$ 0,00">
         <div style="display: flex; gap: 10px;">
-            <select id="var-meio" style="flex: 1;">
-                <option value="debito">💰 Débito</option>
-                <option value="credito">💳 Crédito</option>
-            </select>
-            <button onclick="addVariavel()" style="flex: 1;">Registrar</button>
+          <select id="var-meio" style="flex: 1;"><option value="debito">💰 Débito</option><option value="credito">💳 Crédito</option></select>
+          <button onclick="addVariavel()" style="flex: 1;">Salvar</button>
         </div>
       </div>
-      <div class="table-container" style="margin-top: 15px;">
-        <table id="tabela-variaveis">
-            <thead><tr><th>Data</th><th>Desc.</th><th>Valor</th><th></th></tr></thead>
-            <tbody></tbody>
-        </table>
-      </div>
+      <div class="table-container" style="margin-top: 15px;"><table id="tabela-variaveis"><tbody></tbody></table></div>
     </section>
   </div>
 
   <script>
     const STORAGE_KEY = "App_Financeiro_Mobile_Data";
+    let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || inicializarCalendario();
+
+    function formatarMoeda(v) { return Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
+
+    function inicializarCalendario() {
+      const base = { config: { limiteCartao: 0 } };
+      for (let m = 3; m <= 12; m++) {
+        const id = `2026-${String(m).padStart(2, '0')}`;
+        base[id] = { receitas: [{desc: "Adiantamento", valor: 0}, {desc: "Salario", valor: 0}], fixas: [], variaveis: [], pagamentosFatura: 0, usoAdiant: 0, usoSalario: 0 };
+      }
+      return base;
+    }
+
+    function salvar() { localStorage.setItem(STORAGE_KEY, JSON.stringify(dados)); atualizarResumo(); }
+
+    function renderizar() {
+      const mes = document.getElementById("mes_select").value;
+      const info = dados[mes];
+      document.getElementById("cfg-limite").value = dados.config?.limiteCartao || 0;
+
+      document.getElementById("tabela-receitas").innerHTML = info.receitas.map((r, i) => `
+        <tr><td>${r.desc}</td><td><input type="number" inputmode="decimal" class="input-tabela" value="${r.valor.toFixed(2)}" onchange="dados['${mes}'].receitas[${i}].valor=parseFloat(this.value);salvar()"></td>
+        <td><button onclick="removerItem('receitas', ${i})" class="btn-remover">×</button></td></tr>
+      `).join('');
+
+      document.getElementById("tabela-fixas").innerHTML = info.fixas.map((d, i) => `
+        <tr style="${d.paga ? 'opacity: 0.4' : ''}">
+          <td><input type="checkbox" ${d.paga ? 'checked' : ''} onchange="dados['${mes}'].fixas[${i}].paga=this.checked;salvar();renderizar()"></td>
+          <td>${d.data.split('-')[2]} - ${d.categoria}</td>
+          <td><input type="number" inputmode="decimal" class="input-tabela" value="${d.valor.toFixed(2)}" onchange="dados['${mes}'].fixas[${i}].valor=parseFloat(this.value);salvar()"></td>
+          <td>${d.meio==='credito'?'💳':'💰'}</td>
+          <td><button onclick="removerItem('fixas', ${i})" class="btn-remover">×</button></td>
+        </tr>`).join('');
+
+      document.getElementById("tabela-variaveis").querySelector("tbody").innerHTML = info.variaveis.map((v, i) => `
+        <tr><td>${v.data.split('-')[2]}/${v.data.split('-')[1]}</td><td>${v.descricao}</td><td>${formatarMoeda(v.valor)}</td>
+        <td><button onclick="removerItem('variaveis', ${i})" class="btn-remover">×</button></td></tr>
+      `).join('');
+      
+      document.getElementById("total-antecipado-exibicao").textContent = `Pago: ${formatarMoeda(info.pagamentosFatura || 0)}`;
+      atualizarResumo();
+    }
+
+    function atualizarResumo() {
+      const mes = document.getElementById("mes_select").value;
+      const info = dados[mes];
+      const limiteBase = dados.config?.limiteCartao || 0;
+      let totalReceita = 0; info.receitas.forEach(r => totalReceita += r.valor);
+      const vAdiant = info.receitas.find(r => r.desc.toLowerCase().includes("adiant"))?.valor || 0;
+      const vSal = info.receitas.find(r => r.desc.toLowerCase().includes("salario"))?.valor || 0;
+      let pAdiant = 0, pSal = 0, faturaGasta = 0;
+      
+      [...info.fixas, ...info.variaveis].forEach(item => {
+        if (item.meio === 'credito') faturaGasta += item.valor;
+        else if (item.paga || (item.descricao && item.meio === 'debito')) { 
+          const dia = parseInt(item.data.split('-')[2]);
+          if (dia <= 15) pAdiant += item.valor; else pSal += item.valor;
+        }
+      });
+
+      const pagoFatura = info.pagamentosFatura || 0;
+      document.getElementById("receita-total-mes").textContent = formatarMoeda(totalReceita);
+      document.getElementById("saldo-adiantamento").textContent = formatarMoeda(vAdiant - (info.usoAdiant || 0) - pAdiant);
+      document.getElementById("saldo-salario").textContent = formatarMoeda(vSal - (info.usoSalario || 0) - pSal);
+      document.getElementById("fatura-restante").textContent = formatarMoeda(faturaGasta - pagoFatura);
+      document.getElementById("limite-disponivel").textContent = formatarMoeda(limiteBase - (faturaGasta - pagoFatura));
+    }
+
+    function addReceita() {
+      const n = prompt("Descrição:"); if(!n) return;
+      const v = prompt("Valor:");
+      dados[document.getElementById("mes_select").value].receitas.push({ desc: n, valor: parseFloat(v) || 0 });
+      salvar(); renderizar();
+    }
+    
+    function addDespesaFixa() {
+      const n = prompt("Descrição:"); if(!n) return;
+      const d = prompt("Dia (01-31):", "10");
+      const v = prompt("Valor:");
+      const m = confirm("Cartão de Crédito?") ? "credito" : "debito";
+      const mes = document.getElementById("mes_select").value;
+      dados[mes].fixas.push({ data: `${mes}-${d.padStart(2,'0')}`, categoria: n, valor: parseFloat(v) || 0, paga: false, meio: m });
+      salvar(); renderizar();
+    }
+
+    function addVariavel() {
+      const data = document.getElementById("var-data").value;
+      const desc = document.getElementById("var-desc").value;
+      const valor = parseFloat(document.getElementById("var-valor").value);
+      const meio = document.getElementById("var-meio").value;
+      if (!data || !valor) return alert("Preencha data e valor.");
+      dados[document.getElementById("mes_select").value].variaveis.push({ data, descricao: desc, valor, meio });
+      document.getElementById("var-valor").value = "";
+      document.getElementById("var-desc").value = "";
+      salvar(); renderizar();
+    }
+
+    function registrarPagamentoFatura() {
+      const mes = document.getElementById("mes_select").value;
+      const data = document.getElementById("ant-data").value;
+      const valor = parseFloat(document.getElementById("ant-valor").value);
+      if(!data || !valor) return alert("Preencha os campos.");
+      const dia = parseInt(data.split('-')[2]);
+      if (!dados[mes].pagamentosFatura) dados[mes].pagamentosFatura = 0;
+      dados[mes].pagamentosFatura += valor;
+      if (dia <= 15) dados[mes].usoAdiant = (dados[mes].usoAdiant || 0) + valor;
+      else dados[mes].usoSalario = (dados[mes].usoSalario || 0) + valor;
+      salvar(); renderizar();
+    }
+
+    function replicarFixas() {
+      const mesAtual = document.getElementById("mes_select").value;
+      const fixasAtuais = dados[mesAtual].fixas;
+      if (fixasAtuais.length === 0) return alert("Sem fixas.");
+      if (confirm("Replicar para os próximos meses?")) {
+        const meses = Object.keys(dados).filter(k => k.startsWith("2026-"));
+        const idx = meses.indexOf(mesAtual);
+        for (let i = idx + 1; i < meses.length; i++) {
+          dados[meses[i]].fixas = fixasAtuais.map(f => ({ ...f, paga: false, data: `${meses[i]}-${f.data.split('-')[2]}` }));
+        }
+        salvar(); renderizar();
+      }
+    }
+
+    function popularMeses() {
+      const sel = document.getElementById("mes_select");
+      const meses = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+      for(let i=2; i<12; i++) {
+        let opt = document.createElement("option");
+        opt.value = `2026-${String(i+1).padStart(2,'0')}`;
+        opt.textContent = meses[i];
+        if(opt.value === "2026-03") opt.selected = true;
+        sel.appendChild(opt);
+      }
+    }
+
+    function removerItem(tipo, i) { if(confirm("Excluir?")) { dados[document.getElementById("mes_select").value][tipo].splice(i,1); salvar(); renderizar(); } }
+    function exportarJSON() {
+      const blob = new Blob([JSON.stringify(dados)], {type: 'application/json'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'backup.json'; a.click();
+    }
+    function importarJSON(e) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { try { dados = JSON.parse(ev.target.result); salvar(); renderizar(); } catch { alert("Erro arquivo"); } };
+      reader.readAsText(e.target.files[0]);
+    }
+
+    // --- LÓGICA DE INSTALAÇÃO ---
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById('install-area').style.display = 'block';
+      document.getElementById('btn-install').addEventListener('click', () => {
+        document.getElementById('install-area').style.display = 'none';
+        deferredPrompt.prompt();
+        deferredPrompt = null;
+      });
+    });
+    window.addEventListener('appinstalled', () => { document.getElementById('install-area').style.display = 'none'; });
+
+    popularMeses();
+    renderizar();
+  </script>
+</body>
+</html>
