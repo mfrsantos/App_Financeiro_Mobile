@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Finanças Mobile v1.7.2.2</title>
+  <title>Finanças Mobile v1.7.5</title>
   
-  <link rel="manifest" href="manifest.json?v=1.2">
+  <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#3b82f6">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -171,11 +171,21 @@
   </div>
 
   <script>
+    // DIAGNÓSTICO E REGISTRO PWA
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js')
-        .then(() => console.log('SW: Ativo'))
-        .catch(err => console.log('SW: Erro', err));
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('SW ativo:', reg.scope))
+          .catch(err => alert("ERRO SW: " + err.message));
+      });
     }
+
+    // Monitor do Botão de Instalação
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      console.log('App pronto para instalação');
+      alert("✅ O App está pronto para ser instalado! Procure 'Instalar' no menu do navegador.");
+    });
 
     const STORAGE_KEY = "App_Financeiro_Mobile_Data";
     let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || inicializar();
@@ -217,12 +227,12 @@
           <td class="col-acao"><button onclick="removerItem('fixas', ${i})" class="btn-remover">×</button></td>
         </tr>`}).join('');
 
-      // Antecipações
+      // Pagamentos Fatura
       document.getElementById("tabela-pagamentos-fatura").innerHTML = (info.pagamentosFatura || []).map((p, i) => `
         <tr><td class="col-data">${p.data.split('-')[2]}/${p.data.split('-')[1]}</td><td style="white-space: normal;">${formatarMoeda(p.valor)}</td>
         <td class="col-acao"><button onclick="removerPagamentoFatura(${i})" class="btn-remover">×</button></td></tr>`).join('');
 
-      // Variáveis com exibição de meio
+      // Variáveis com ícones de meio
       document.getElementById("tabela-variaveis-body").innerHTML = (info.variaveis || []).map((v, i) => `
         <tr>
           <td class="col-data">${v.data.split('-')[2]}/${v.data.split('-')[1]}</td>
@@ -333,7 +343,7 @@
 
     function replicarFixas() {
       const mesAt = document.getElementById("mes_select").value, fix = dados[mesAt].fixas;
-      if(confirm("Replicar fixas para os próximos meses?")) {
+      if(confirm("Replicar fixas?")) {
         const meses = Object.keys(dados).filter(k => k.startsWith("2026-"));
         const idx = meses.indexOf(mesAt);
         for(let i=idx+1; i<meses.length; i++) { dados[meses[i]].fixas = fix.map(f => ({...f, paga:false, meio: '', data:''})); }
