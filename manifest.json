@@ -1,6 +1,6 @@
 {
-  "short_name": "Finanças",
-  "name": "Controle Financeiro",
+  "short_name": "Finanças Mob",
+  "name": "App Financeiro Mobile",
   "icons": [
     {
       "src": "https://cdn-icons-png.flaticon.com/512/2343/2343101.png",
@@ -9,9 +9,9 @@
       "purpose": "any maskable"
     }
   ],
-  "start_url": "/App_Financeiro/index.html",
+  "start_url": "/App_Financeiro_Mobile/index.html",
   "background_color": "#121212",
   "display": "standalone",
-  "scope": "/App_Financeiro/",
-  "theme_color": "#1e1e1e"
+  "scope": "/App_Financeiro_Mobile/",
+  "theme_color": "#121212"
 }
