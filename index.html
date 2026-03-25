@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>App Financeiro Mobile v1.7.2</title>
+  <title>Finanças Mobile v1.7.2.2</title>
   
-  <link rel="manifest" href="manifest.json?v=1.0">
+  <link rel="manifest" href="manifest.json?v=1.2">
   <meta name="theme-color" content="#3b82f6">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -101,7 +101,7 @@
         <button class="btn-add" onclick="addReceita()">+ Receita</button>
         <div class="table-container">
           <table>
-            <thead><tr><th>Descrição</th><th class="col-valor">Valor</th><th class="col-acao">Apagar?</th></tr></thead>
+            <thead><tr><th>Descrição</th><th class="col-valor">Valor</th><th class="col-acao"></th></tr></thead>
             <tbody id="tabela-receitas"></tbody>
           </table>
         </div>
@@ -115,7 +115,7 @@
         <button class="btn-add" onclick="addDespesaFixa()">+ Fixa</button>
         <div class="table-container">
           <table>
-            <thead><tr><th class="col-pago">OK</th><th>Descrição</th><th class="col-valor">Valor</th><th>Meio</th><th class="col-acao">Apagar?</th></tr></thead>
+            <thead><tr><th class="col-pago">OK</th><th>Descrição</th><th class="col-valor">Valor</th><th>Meio</th><th class="col-acao"></th></tr></thead>
             <tbody id="tabela-fixas"></tbody>
           </table>
         </div>
@@ -171,11 +171,10 @@
   </div>
 
   <script>
-    // Registro do Service Worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js')
-        .then(() => console.log('Service Worker registrado!'))
-        .catch(err => console.log('Erro no SW:', err));
+        .then(() => console.log('SW: Ativo'))
+        .catch(err => console.log('SW: Erro', err));
     }
 
     const STORAGE_KEY = "App_Financeiro_Mobile_Data";
@@ -186,7 +185,7 @@
       const base = { config: { limiteCartao: 0 } };
       for (let m = 3; m <= 12; m++) {
         const id = `2026-${String(m).padStart(2, '0')}`;
-        base[id] = { receitas: [{desc: "Adiantamento", valor: 0}, {desc: "Salario", valor: 0}], fixas: [], variaveis: [], pagamentosFatura: [] };
+        base[id] = { receitas: [{desc: "Adiantamento", valor: 0}, {desc: "Salário", valor: 0}], fixas: [], variaveis: [], pagamentosFatura: [] };
       }
       return base;
     }
@@ -196,15 +195,17 @@
 
     function renderizar() {
       const mes = document.getElementById("mes_select").value;
+      if (!dados[mes]) dados[mes] = { receitas: [], fixas: [], variaveis: [], pagamentosFatura: [] };
       const info = dados[mes];
-      if(!info.pagamentosFatura) info.pagamentosFatura = [];
       
       document.getElementById("cfg-limite").value = (dados.config.limiteCartao || 0).toFixed(2);
 
+      // Receitas
       document.getElementById("tabela-receitas").innerHTML = info.receitas.map((r, i) => `
         <tr><td>${r.desc}</td><td class="col-valor"><input type="number" step="0.01" class="input-tabela" value="${r.valor.toFixed(2)}" onchange="dados['${mes}'].receitas[${i}].valor=parseFloat(this.value) || 0;salvar()"></td>
         <td class="col-acao"><button onclick="removerItem('receitas', ${i})" class="btn-remover">×</button></td></tr>`).join('');
 
+      // Fixas
       document.getElementById("tabela-fixas").innerHTML = info.fixas.map((f, i) => {
         const dExib = f.paga && f.data && f.meio === 'debito' ? f.data.split('-')[2] + '/' + f.data.split('-')[1] : '';
         return `
@@ -216,13 +217,19 @@
           <td class="col-acao"><button onclick="removerItem('fixas', ${i})" class="btn-remover">×</button></td>
         </tr>`}).join('');
 
-      document.getElementById("tabela-pagamentos-fatura").innerHTML = info.pagamentosFatura.map((p, i) => `
+      // Antecipações
+      document.getElementById("tabela-pagamentos-fatura").innerHTML = (info.pagamentosFatura || []).map((p, i) => `
         <tr><td class="col-data">${p.data.split('-')[2]}/${p.data.split('-')[1]}</td><td style="white-space: normal;">${formatarMoeda(p.valor)}</td>
         <td class="col-acao"><button onclick="removerPagamentoFatura(${i})" class="btn-remover">×</button></td></tr>`).join('');
 
-      document.getElementById("tabela-variaveis-body").innerHTML = info.variaveis.map((v, i) => `
-        <tr><td class="col-data">${v.data.split('-')[2]}/${v.data.split('-')[1]}</td><td style="white-space: normal;">${v.descricao}</td><td class="col-valor">${formatarMoeda(v.valor)}</td>
-        <td class="col-acao"><button onclick="removerItem('variaveis', ${i})" class="btn-remover">×</button></td></tr>`).join('');
+      // Variáveis com exibição de meio
+      document.getElementById("tabela-variaveis-body").innerHTML = (info.variaveis || []).map((v, i) => `
+        <tr>
+          <td class="col-data">${v.data.split('-')[2]}/${v.data.split('-')[1]}</td>
+          <td style="white-space: normal;">${v.meio === 'credito' ? '💳' : '💰'} ${v.descricao}</td>
+          <td class="col-valor">${formatarMoeda(v.valor)}</td>
+          <td class="col-acao"><button onclick="removerItem('variaveis', ${i})" class="btn-remover">×</button></td>
+        </tr>`).join('');
       
       atualizarResumo();
     }
@@ -234,7 +241,9 @@
       info.receitas.forEach(r => {
         bruta += r.valor;
         const d = r.desc.toLowerCase();
-        if (d.includes("adiant")) vAdiant = r.valor; else if (d.includes("salario")) vSal = r.valor; else avulsa += r.valor;
+        if (d.includes("adiant")) vAdiant += r.valor; 
+        else if (d.includes("salario") || d.includes("salário")) vSal += r.valor; 
+        else avulsa += r.valor;
       });
       let fatura = 0, pAdiant = 0, pSal = 0;
       [...info.fixas, ...info.variaveis].forEach(item => {
@@ -245,13 +254,11 @@
         }
       });
       let totalPagoFatura = 0;
-      if (info.pagamentosFatura) {
-        info.pagamentosFatura.forEach(p => {
-          totalPagoFatura += p.valor;
-          const dia = parseInt(p.data.split('-')[2]);
-          if (dia <= 15) pAdiant += p.valor; else pSal += p.valor;
-        });
-      }
+      (info.pagamentosFatura || []).forEach(p => {
+        totalPagoFatura += p.valor;
+        const dia = parseInt(p.data.split('-')[2]);
+        if (dia <= 15) pAdiant += p.valor; else pSal += p.valor;
+      });
       document.getElementById("res-bruta").textContent = formatarMoeda(bruta);
       document.getElementById("res-adiant").textContent = formatarMoeda(vAdiant - pAdiant);
       document.getElementById("res-salario").textContent = formatarMoeda(vSal - pSal);
@@ -279,7 +286,7 @@
       if (meio === 'credito') {
         item.meio = 'credito'; item.data = `${mes}-01`; item.paga = true;
       } else {
-        const d = prompt("Dia do pagamento (DD):", "10");
+        const d = prompt("Dia (DD):", new Date().getDate());
         if (d) { item.meio = 'debito'; item.data = `${mes}-${String(d).padStart(2, '0')}`; item.paga = true; }
       }
       fecharModal(); salvar(); renderizar();
@@ -295,7 +302,7 @@
     }
 
     function removerPagamentoFatura(idx) {
-      if(confirm("Estornar este pagamento?")) {
+      if(confirm("Estornar?")) {
         dados[document.getElementById("mes_select").value].pagamentosFatura.splice(idx, 1);
         salvar(); renderizar();
       }
@@ -304,6 +311,7 @@
     function addVariavel() {
       const mes = document.getElementById("mes_select").value, data = document.getElementById("var-data").value, desc = document.getElementById("var-desc").value, valor = parseFloat(document.getElementById("var-valor").value), meio = document.getElementById("var-meio").value;
       if (!data || isNaN(valor)) return alert("Preencha Data e Valor!");
+      if (!dados[mes].variaveis) dados[mes].variaveis = [];
       dados[mes].variaveis.push({ data, descricao: desc, valor, meio });
       document.getElementById("var-data").value = ""; document.getElementById("var-desc").value = ""; document.getElementById("var-valor").value = "";
       salvar(); renderizar();
@@ -317,7 +325,7 @@
     }
 
     function addDespesaFixa() {
-      const n = prompt("Nome da conta:"); if(!n) return;
+      const n = prompt("Nome:"); if(!n) return;
       const v = parseFloat(prompt("Valor:").replace(',', '.'));
       dados[document.getElementById("mes_select").value].fixas.push({ data: '', categoria: n, valor: v || 0, paga: false, meio: '' });
       salvar(); renderizar();
@@ -325,7 +333,7 @@
 
     function replicarFixas() {
       const mesAt = document.getElementById("mes_select").value, fix = dados[mesAt].fixas;
-      if(confirm("Replicar contas fixas para os próximos meses?")) {
+      if(confirm("Replicar fixas para os próximos meses?")) {
         const meses = Object.keys(dados).filter(k => k.startsWith("2026-"));
         const idx = meses.indexOf(mesAt);
         for(let i=idx+1; i<meses.length; i++) { dados[meses[i]].fixas = fix.map(f => ({...f, paga:false, meio: '', data:''})); }
@@ -335,6 +343,7 @@
 
     function popularMeses() {
       const sel = document.getElementById("mes_select"), ms = ["Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+      sel.innerHTML = "";
       ms.forEach((m, i) => { 
         let o = document.createElement("option"); o.value = `2026-${String(i+3).padStart(2,'0')}`; o.textContent = m; 
         if(o.value === "2026-03") o.selected = true; sel.appendChild(o); 
@@ -342,8 +351,8 @@
     }
 
     function removerItem(tipo, i) { if(confirm("Excluir?")) { dados[document.getElementById("mes_select").value][tipo].splice(i,1); salvar(); renderizar(); } }
-    function exportarJSON() { const b = new Blob([JSON.stringify(dados)], {type:'application/json'}); const a = document.createElement('a'); a.href=URL.createObjectURL(b); a.download='backup_financeiro.json'; a.click(); }
-    function importarJSON(e) { const r = new FileReader(); r.onload=(v)=>{dados=JSON.parse(v.target.result);salvar();renderizar();}; r.readAsText(e.target.files[0]); }
+    function exportarJSON() { const b = new Blob([JSON.stringify(dados)], {type:'application/json'}); const a = document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`backup_financeiro.json`; a.click(); }
+    function importarJSON(e) { const r = new FileReader(); r.onload = (v) => { dados = JSON.parse(v.target.result); salvar(); renderizar(); }; r.readAsText(e.target.files[0]); }
 
     popularMeses(); renderizar();
   </script>
