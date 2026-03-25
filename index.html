@@ -20,6 +20,38 @@
         .then(() => console.log("App Financeiro Mobile: PWA Ativo"))
         .catch((err) => console.log("Erro PWA:", err));
     }
+    // --- LÓGICA DE INSTALAÇÃO SIMPLIFICADA ---
+let deferredPrompt;
+const installArea = document.getElementById('install-area');
+const btnInstall = document.getElementById('btn-install');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  // Impede o Chrome de mostrar o aviso padrão chato
+  e.preventDefault();
+  // Guarda o evento para disparar quando o usuário clicar no nosso botão
+  deferredPrompt = e;
+  // Mostra o nosso banner bonito de instalação
+  installArea.style.display = 'block';
+
+  btnInstall.addEventListener('click', () => {
+    // Esconde o nosso banner
+    installArea.style.display = 'none';
+    // Abre a janelinha oficial de instalação do Android
+    deferredPrompt.prompt();
+    
+    deferredPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') {
+        console.log('O usuário aceitou instalar o App Financeiro');
+      }
+      deferredPrompt = null;
+    });
+  });
+});
+
+// Se o app já estiver instalado, ele nem mostra o botão
+window.addEventListener('appinstalled', () => {
+  installArea.style.display = 'none';
+});
   </script>
 
   <style>
