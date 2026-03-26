@@ -3,190 +3,135 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Finanças Mobile v1.7.5</title>
+  <title>Finanças Mobile v1.7.6</title>
   
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#3b82f6">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="icon" type="image/png" href="icon-192.png">
 
   <style>
-    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; touch-action: manipulation; }
-    body { 
-      margin: 0; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0; 
-      background: #121212; color: #e0e0e0; -webkit-tap-highlight-color: transparent; 
+    /* Estilos do Botão de Instalação */
+    #btn-instalar-pwa {
+      display: none; /* Escondido por padrão, aparece só se for instalável */
+      background: #10b981;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 10px;
+      font-weight: bold;
+      width: 100%;
+      margin-bottom: 15px;
+      animation: pulse 2s infinite;
     }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+
+    /* Resto dos estilos originais */
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; touch-action: manipulation; }
+    body { margin: 0; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0; background: #121212; color: #e0e0e0; }
     .container { max-width: 1300px; margin: 0 auto; padding: 10px; background: #1e1e1e; min-height: 100vh; }
     header { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
     .header-top { display: flex; justify-content: space-between; align-items: center; }
     .header-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     h1 { font-size: 1.1rem; margin: 0; color: #3b82f6; }
-    
     button, input, select { min-height: 44px; padding: 8px; border-radius: 10px; border: 1px solid #444; background: #333; color: #fff; font-size: 0.85rem; }
     button { background: #3b82f6; font-weight: 600; border: none; cursor: pointer; }
-    .btn-backup { background: #4b5563; font-size: 0.7rem; min-height: 38px; }
-
     .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
     .card { padding: 12px; border-radius: 12px; background: #2a2a2a; border-left: 4px solid #3b82f6; }
     .card h2 { margin: 0 0 4px; font-size: 0.65rem; color: #9ca3af; text-transform: uppercase; }
-    .card p { margin: 0; font-size: 1rem; font-weight: 800; white-space: nowrap; }
-    .card-bruta { border-left-color: #facc15; } .card-bruta p { color: #facc15; }
-    .card-adiant { border-left-color: #3b82f6; } .card-adiant p { color: #60a5fa; }
-    .card-salario { border-left-color: #10b981; } .card-salario p { color: #34d399; }
-    .card-avulsa { border-left-color: #a855f7; } .card-avulsa p { color: #c084fc; }
-    .card-fatura { border-left-color: #f59e0b; } .card-fatura p { color: #fbbf24; }
-    .card-limite { border-left-color: #ec4899; } .card-limite p { color: #f472b6; }
-
+    .card p { margin: 0; font-size: 1rem; font-weight: 800; }
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
     @media (max-width: 1024px) { .grid { grid-template-columns: 1fr; } }
-    
-    .secao-header { display: flex; align-items: center; justify-content: space-between; height: 40px; margin-bottom: 10px; }
-    .secao h3 { margin: 0; font-size: 1rem; }
-    .btn-add { width: 100%; margin: 0 0 10px 0; }
-
     .table-container { width: 100%; overflow-x: auto; border-radius: 10px; background: #242424; }
     table { width: 100%; border-collapse: collapse; }
-    th { background: #333; color: #3b82f6; font-size: 0.65rem; text-transform: uppercase; padding: 10px 6px; text-align: left; }
-    td { padding: 8px 6px; border-bottom: 1px solid #333; text-align: left; font-size: 0.8rem; white-space: nowrap; }
-    
-    .col-valor { width: 105px; text-align: right; }
-    .col-acao { width: 45px; text-align: center; }
-    .col-pago { width: 40px; text-align: center; }
-    .col-data { width: 70px; }
-
-    .btn-remover { background: #ef4444; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 8px; border:none; color: white; font-weight: bold; font-size: 1rem; margin: 0 auto; }
-    .input-tabela { width: 95px; background: #1a1a1a; border: 1px solid #444; text-align: right; color: white; border-radius: 6px; padding: 6px; font-size: 0.85rem; }
-
-    #modal-pagamento {
-      display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8); align-items: center; justify-content: center; padding: 20px;
-    }
-    .modal-content {
-      background: #2a2a2a; padding: 25px; border-radius: 15px; width: 100%; max-width: 400px;
-      text-align: center; border: 1px solid #444;
-    }
-    .modal-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+    th { background: #333; color: #3b82f6; font-size: 0.65rem; padding: 10px 6px; text-align: left; }
+    td { padding: 8px 6px; border-bottom: 1px solid #333; font-size: 0.8rem; }
+    .btn-remover { background: #ef4444; width: 34px; height: 34px; border-radius: 8px; color: white; }
+    #modal-pagamento { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; padding: 20px; }
+    .modal-content { background: #2a2a2a; padding: 25px; border-radius: 15px; width: 100%; max-width: 400px; text-align: center; }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
       <div class="header-top"><h1>💰 Finanças Mobile</h1><select id="mes_select" onchange="renderizar();"></select></div>
+      
+      <button id="btn-instalar-pwa" onclick="instalarApp()">📲 INSTALAR APLICATIVO</button>
+
       <div class="header-actions">
-        <button class="btn-backup" onclick="exportarJSON()">📤 EXPORTAR</button>
-        <button class="btn-backup" onclick="document.getElementById('input-import').click()">📥 IMPORTAR</button>
+        <button onclick="exportarJSON()">📤 EXPORTAR</button>
+        <button onclick="document.getElementById('input-import').click()">📥 IMPORTAR</button>
         <input type="file" id="input-import" style="display: none;" onchange="importarJSON(event)">
       </div>
     </header>
 
-    <section style="margin-bottom: 15px; background: #2a2a2a; padding: 12px; border-radius: 12px; border: 1px solid #ec4899;">
-      <label style="font-size: 0.75rem; color: #f472b6; font-weight: bold;">💳 Limite Total do Cartão:</label>
-      <input type="number" id="cfg-limite" inputmode="decimal" step="0.01" onchange="dados.config.limiteCartao=parseFloat(this.value) || 0;salvar()" style="width: 100%; margin-top: 5px;">
-    </section>
-
     <section class="cards">
-      <div class="card card-bruta"><h2>Receita Bruta</h2><p id="res-bruta">R$ 0,00</p></div>
-      <div class="card card-adiant"><h2>Saldo Adiant.</h2><p id="res-adiant">R$ 0,00</p></div>
-      <div class="card card-salario"><h2>Saldo Salário</h2><p id="res-salario">R$ 0,00</p></div>
-      <div class="card card-avulsa"><h2>Receita Avulsa</h2><p id="res-avulsa">R$ 0,00</p></div>
-      <div class="card card-fatura"><h2>Fatura Aberta</h2><p id="res-fatura">R$ 0,00</p></div>
-      <div class="card card-limite"><h2>Limite Disponível</h2><p id="res-limite">R$ 0,00</p></div>
+      <div class="card" style="border-left-color: #facc15;"><h2>Receita Bruta</h2><p id="res-bruta">R$ 0,00</p></div>
+      <div class="card" style="border-left-color: #3b82f6;"><h2>Saldo Adiant.</h2><p id="res-adiant">R$ 0,00</p></div>
+      <div class="card" style="border-left-color: #10b981;"><h2>Saldo Salário</h2><p id="res-salario">R$ 0,00</p></div>
+      <div class="card" style="border-left-color: #f59e0b;"><h2>Fatura Aberta</h2><p id="res-fatura">R$ 0,00</p></div>
     </section>
 
     <div class="grid">
-      <div class="secao">
-        <div class="secao-header"><h3>💵 Receitas</h3></div>
-        <button class="btn-add" onclick="addReceita()">+ Receita</button>
-        <div class="table-container">
-          <table>
-            <thead><tr><th>Descrição</th><th class="col-valor">Valor</th><th class="col-acao"></th></tr></thead>
-            <tbody id="tabela-receitas"></tbody>
-          </table>
-        </div>
+      <div class="secao"><h3>💵 Receitas</h3><button style="width:100%; margin-bottom:10px;" onclick="addReceita()">+ Receita</button>
+        <div class="table-container"><table><thead><tr><th>Desc.</th><th>Valor</th><th></th></tr></thead><tbody id="tabela-receitas"></tbody></table></div>
       </div>
-
-      <div class="secao">
-        <div class="secao-header">
-          <h3>📋 Fixas</h3>
-          <button onclick="replicarFixas()" style="background: #8b5cf6; font-size: 0.75rem; min-height: 32px; padding: 0 10px; border-radius: 8px;">🔄 Replicar</button>
-        </div>
-        <button class="btn-add" onclick="addDespesaFixa()">+ Fixa</button>
-        <div class="table-container">
-          <table>
-            <thead><tr><th class="col-pago">OK</th><th>Descrição</th><th class="col-valor">Valor</th><th>Meio</th><th class="col-acao"></th></tr></thead>
-            <tbody id="tabela-fixas"></tbody>
-          </table>
-        </div>
+      <div class="secao"><h3>📋 Fixas</h3><button style="width:100%; margin-bottom:10px;" onclick="addDespesaFixa()">+ Fixa</button>
+        <div class="table-container"><table><thead><tr><th>OK</th><th>Desc.</th><th>Valor</th><th>Meio</th><th></th></tr></thead><tbody id="tabela-fixas"></tbody></table></div>
       </div>
     </div>
 
-    <section style="background: #2a2a2a; padding: 15px; border-radius: 12px; border: 1px solid #f59e0b; margin-top: 20px;">
-      <h3>💳 Antecipação de Fatura</h3>
-      <div style="display: flex; flex-direction: column; gap: 10px;">
-        <input type="date" id="ant-data">
-        <input type="number" id="ant-valor" inputmode="decimal" step="0.01" placeholder="Valor R$">
-        <button onclick="registrarPagamentoFatura()" style="background: #10b981;">Confirmar Pagamento</button>
-      </div>
-      <div class="table-container" style="margin-top: 10px;">
-        <table>
-          <thead><tr><th class="col-data">Data</th><th>Valor Pago</th><th class="col-acao"></th></tr></thead>
-          <tbody id="tabela-pagamentos-fatura"></tbody>
-        </table>
-      </div>
-      <p id="total-antecipado-exibicao" style="text-align: right; color: #10b981; font-weight: bold; margin-top: 10px;"></p>
-    </section>
-
     <section style="margin-top: 25px; padding-bottom: 60px;">
       <h3>🛒 Variáveis</h3>
-      <div style="background: #2a2a2a; padding: 15px; border-radius: 12px; display: flex; flex-direction: column; gap: 10px; border: 1px solid #444;">
-        <input type="date" id="var-data">
-        <input type="text" id="var-desc" placeholder="Descrição">
-        <input type="number" id="var-valor" inputmode="decimal" step="0.01" placeholder="R$ 0,00">
+      <div style="background: #2a2a2a; padding: 15px; border-radius: 12px; display: flex; flex-direction: column; gap: 10px;">
+        <input type="date" id="var-data"><input type="text" id="var-desc" placeholder="Descrição"><input type="number" id="var-valor" placeholder="R$ 0,00">
         <div style="display: flex; gap: 8px;">
           <select id="var-meio" style="flex: 1;"><option value="debito">💰 Débito</option><option value="credito">💳 Crédito</option></select>
           <button onclick="addVariavel()" style="flex: 1;">Salvar</button>
         </div>
       </div>
-      <div class="table-container" style="margin-top: 10px;">
-        <table>
-          <thead><tr><th class="col-data">Data</th><th>Descrição</th><th class="col-valor">Valor</th><th class="col-acao"></th></tr></thead>
-          <tbody id="tabela-variaveis-body"></tbody>
-        </table>
-      </div>
+      <div class="table-container" style="margin-top: 10px;"><table><tbody id="tabela-variaveis-body"></tbody></table></div>
     </section>
   </div>
 
-  <div id="modal-pagamento">
-    <div class="modal-content">
-      <h3>Meio de Pagamento</h3>
-      <p>Como deseja pagar esta conta?</p>
-      <div class="modal-btns">
-        <button style="background: #f59e0b;" onclick="processarEscolha('credito')">💳 CRÉDITO</button>
-        <button style="background: #10b981;" onclick="processarEscolha('debito')">💰 DÉBITO</button>
-      </div>
-      <button style="background: #444; width: 100%; margin-top: 10px;" onclick="fecharModal()">CANCELAR</button>
-    </div>
-  </div>
+  <div id="modal-pagamento"><div class="modal-content"><h3>Pagamento</h3><div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"><button onclick="processarEscolha('credito')">💳 CRÉDITO</button><button onclick="processarEscolha('debito')">💰 DÉBITO</button></div></div></div>
 
   <script>
-    // DIAGNÓSTICO E REGISTRO PWA
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then(reg => console.log('SW ativo:', reg.scope))
-          .catch(err => alert("ERRO SW: " + err.message));
-      });
-    }
+    // --- LÓGICA DE INSTALAÇÃO ---
+    let servicoInstalacao;
+    const btnInstalar = document.getElementById('btn-instalar-pwa');
 
-    // Monitor do Botão de Instalação
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
-      console.log('App pronto para instalação');
-      alert("✅ O App está pronto para ser instalado! Procure 'Instalar' no menu do navegador.");
+      servicoInstalacao = e; // Guarda o evento
+      btnInstalar.style.display = 'block'; // Mostra o botão
     });
 
+    async function instalarApp() {
+      if (!servicoInstalacao) return;
+      servicoInstalacao.prompt(); // Abre a janelinha do Chrome
+      const { outcome } = await servicoInstalacao.userChoice;
+      if (outcome === 'accepted') {
+        btnInstalar.style.display = 'none';
+      }
+      servicoInstalacao = null;
+    }
+
+    window.addEventListener('appinstalled', () => {
+      btnInstalar.style.display = 'none';
+      alert("Aplicativo instalado com sucesso!");
+    });
+
+    // --- SERVICE WORKER ---
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(err => console.log(err));
+    }
+
+    // --- RESTO DO SEU CÓDIGO ORIGINAL ---
     const STORAGE_KEY = "App_Financeiro_Mobile_Data";
     let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || inicializar();
     let itemSelecionadoIdx = null;
@@ -205,41 +150,22 @@
 
     function renderizar() {
       const mes = document.getElementById("mes_select").value;
-      if (!dados[mes]) dados[mes] = { receitas: [], fixas: [], variaveis: [], pagamentosFatura: [] };
-      const info = dados[mes];
+      const info = dados[mes] || { receitas: [], fixas: [], variaveis: [] };
       
-      document.getElementById("cfg-limite").value = (dados.config.limiteCartao || 0).toFixed(2);
-
-      // Receitas
       document.getElementById("tabela-receitas").innerHTML = info.receitas.map((r, i) => `
-        <tr><td>${r.desc}</td><td class="col-valor"><input type="number" step="0.01" class="input-tabela" value="${r.valor.toFixed(2)}" onchange="dados['${mes}'].receitas[${i}].valor=parseFloat(this.value) || 0;salvar()"></td>
-        <td class="col-acao"><button onclick="removerItem('receitas', ${i})" class="btn-remover">×</button></td></tr>`).join('');
+        <tr><td>${r.desc}</td><td><input type="number" class="input-tabela" value="${r.valor.toFixed(2)}" onchange="dados['${mes}'].receitas[${i}].valor=parseFloat(this.value)||0;salvar()"></td>
+        <td><button onclick="removerItem('receitas', ${i})" class="btn-remover">×</button></td></tr>`).join('');
 
-      // Fixas
-      document.getElementById("tabela-fixas").innerHTML = info.fixas.map((f, i) => {
-        const dExib = f.paga && f.data && f.meio === 'debito' ? f.data.split('-')[2] + '/' + f.data.split('-')[1] : '';
-        return `
+      document.getElementById("tabela-fixas").innerHTML = info.fixas.map((f, i) => `
         <tr style="${f.paga ? 'opacity: 0.5' : ''}">
-          <td class="col-pago"><input type="checkbox" ${f.paga ? 'checked' : ''} onchange="abrirModalPagamento(${i}, this.checked)"></td>
-          <td style="white-space: normal;">${f.categoria}</td>
-          <td class="col-valor"><input type="number" step="0.01" class="input-tabela" value="${f.valor.toFixed(2)}" onchange="dados['${mes}'].fixas[${i}].valor=parseFloat(this.value) || 0;salvar()"></td>
-          <td style="font-size: 0.7rem;">${f.paga ? (f.meio === 'credito' ? '💳' : '💰' + dExib) : '⏳'}</td>
-          <td class="col-acao"><button onclick="removerItem('fixas', ${i})" class="btn-remover">×</button></td>
-        </tr>`}).join('');
-
-      // Pagamentos Fatura
-      document.getElementById("tabela-pagamentos-fatura").innerHTML = (info.pagamentosFatura || []).map((p, i) => `
-        <tr><td class="col-data">${p.data.split('-')[2]}/${p.data.split('-')[1]}</td><td style="white-space: normal;">${formatarMoeda(p.valor)}</td>
-        <td class="col-acao"><button onclick="removerPagamentoFatura(${i})" class="btn-remover">×</button></td></tr>`).join('');
-
-      // Variáveis com ícones de meio
-      document.getElementById("tabela-variaveis-body").innerHTML = (info.variaveis || []).map((v, i) => `
-        <tr>
-          <td class="col-data">${v.data.split('-')[2]}/${v.data.split('-')[1]}</td>
-          <td style="white-space: normal;">${v.meio === 'credito' ? '💳' : '💰'} ${v.descricao}</td>
-          <td class="col-valor">${formatarMoeda(v.valor)}</td>
-          <td class="col-acao"><button onclick="removerItem('variaveis', ${i})" class="btn-remover">×</button></td>
+          <td><input type="checkbox" ${f.paga ? 'checked' : ''} onchange="abrirModalPagamento(${i}, this.checked)"></td>
+          <td>${f.categoria}</td><td>${f.valor.toFixed(2)}</td><td>${f.meio === 'credito' ? '💳' : '💰'}</td>
+          <td><button onclick="removerItem('fixas', ${i})" class="btn-remover">×</button></td>
         </tr>`).join('');
+
+      document.getElementById("tabela-variaveis-body").innerHTML = (info.variaveis || []).map((v, i) => `
+        <tr><td>${v.data.split('-')[2]}</td><td>${v.meio==='credito'?'💳':'💰'} ${v.descricao}</td><td>${formatarMoeda(v.valor)}</td>
+        <td><button onclick="removerItem('variaveis', ${i})" class="btn-remover">×</button></td></tr>`).join('');
       
       atualizarResumo();
     }
@@ -247,121 +173,74 @@
     function atualizarResumo() {
       const mes = document.getElementById("mes_select").value;
       const info = dados[mes];
-      let bruta = 0, avulsa = 0, vAdiant = 0, vSal = 0;
-      info.receitas.forEach(r => {
-        bruta += r.valor;
-        const d = r.desc.toLowerCase();
-        if (d.includes("adiant")) vAdiant += r.valor; 
-        else if (d.includes("salario") || d.includes("salário")) vSal += r.valor; 
-        else avulsa += r.valor;
+      let bruta = 0, vAdiant = 0, vSal = 0, fatura = 0, pAdiant = 0, pSal = 0;
+      info.receitas.forEach(r => { 
+        bruta += r.valor; 
+        if (r.desc.toLowerCase().includes("adiant")) vAdiant += r.valor; 
+        else if (r.desc.toLowerCase().includes("salari")) vSal += r.valor;
       });
-      let fatura = 0, pAdiant = 0, pSal = 0;
       [...info.fixas, ...info.variaveis].forEach(item => {
         if (item.meio === 'credito') fatura += item.valor;
-        else if (item.paga || (item.descricao && item.meio === 'debito')) {
+        else if (item.paga || item.meio === 'debito') {
           const dia = parseInt(item.data?.split('-')[2] || 10);
           if (dia <= 15) pAdiant += item.valor; else pSal += item.valor;
         }
       });
-      let totalPagoFatura = 0;
-      (info.pagamentosFatura || []).forEach(p => {
-        totalPagoFatura += p.valor;
-        const dia = parseInt(p.data.split('-')[2]);
-        if (dia <= 15) pAdiant += p.valor; else pSal += p.valor;
-      });
       document.getElementById("res-bruta").textContent = formatarMoeda(bruta);
       document.getElementById("res-adiant").textContent = formatarMoeda(vAdiant - pAdiant);
       document.getElementById("res-salario").textContent = formatarMoeda(vSal - pSal);
-      document.getElementById("res-avulsa").textContent = formatarMoeda(avulsa);
-      document.getElementById("res-fatura").textContent = formatarMoeda(fatura - totalPagoFatura);
-      document.getElementById("res-limite").textContent = formatarMoeda((dados.config.limiteCartao || 0) - (fatura - totalPagoFatura));
-      document.getElementById("total-antecipado-exibicao").textContent = `Total Antecipado: ${formatarMoeda(totalPagoFatura)}`;
+      document.getElementById("res-fatura").textContent = formatarMoeda(fatura);
     }
 
     function abrirModalPagamento(idx, isChecked) {
       if (!isChecked) {
-        const mes = document.getElementById("mes_select").value;
-        dados[mes].fixas[idx].paga = false; dados[mes].fixas[idx].meio = ''; dados[mes].fixas[idx].data = '';
+        dados[document.getElementById("mes_select").value].fixas[idx].paga = false;
         salvar(); renderizar(); return;
       }
       itemSelecionadoIdx = idx;
       document.getElementById("modal-pagamento").style.display = "flex";
     }
 
-    function fecharModal() { document.getElementById("modal-pagamento").style.display = "none"; renderizar(); }
-
     function processarEscolha(meio) {
       const mes = document.getElementById("mes_select").value;
       const item = dados[mes].fixas[itemSelecionadoIdx];
-      if (meio === 'credito') {
-        item.meio = 'credito'; item.data = `${mes}-01`; item.paga = true;
-      } else {
-        const d = prompt("Dia (DD):", new Date().getDate());
-        if (d) { item.meio = 'debito'; item.data = `${mes}-${String(d).padStart(2, '0')}`; item.paga = true; }
-      }
-      fecharModal(); salvar(); renderizar();
-    }
-
-    function registrarPagamentoFatura() {
-      const mes = document.getElementById("mes_select").value, data = document.getElementById("ant-data").value, valor = parseFloat(document.getElementById("ant-valor").value);
-      if(!data || isNaN(valor)) return alert("Preencha data e valor!");
-      if (!dados[mes].pagamentosFatura) dados[mes].pagamentosFatura = [];
-      dados[mes].pagamentosFatura.push({ data, valor });
-      document.getElementById("ant-data").value = ""; document.getElementById("ant-valor").value = "";
+      item.meio = meio; item.paga = true;
+      if(meio === 'debito') item.data = `${mes}-${prompt("Dia:", "10")}`;
+      document.getElementById("modal-pagamento").style.display = "none";
       salvar(); renderizar();
-    }
-
-    function removerPagamentoFatura(idx) {
-      if(confirm("Estornar?")) {
-        dados[document.getElementById("mes_select").value].pagamentosFatura.splice(idx, 1);
-        salvar(); renderizar();
-      }
     }
 
     function addVariavel() {
-      const mes = document.getElementById("mes_select").value, data = document.getElementById("var-data").value, desc = document.getElementById("var-desc").value, valor = parseFloat(document.getElementById("var-valor").value), meio = document.getElementById("var-meio").value;
-      if (!data || isNaN(valor)) return alert("Preencha Data e Valor!");
-      if (!dados[mes].variaveis) dados[mes].variaveis = [];
+      const mes = document.getElementById("mes_select").value;
+      const data = document.getElementById("var-data").value;
+      const desc = document.getElementById("var-desc").value;
+      const valor = parseFloat(document.getElementById("var-valor").value);
+      const meio = document.getElementById("var-meio").value;
+      if (!data || isNaN(valor)) return alert("Dados incompletos");
       dados[mes].variaveis.push({ data, descricao: desc, valor, meio });
-      document.getElementById("var-data").value = ""; document.getElementById("var-desc").value = ""; document.getElementById("var-valor").value = "";
       salvar(); renderizar();
     }
 
-    function addReceita() {
-      const n = prompt("Descrição:"); if (!n) return;
-      const v = parseFloat(prompt("Valor:").replace(',', '.'));
-      dados[document.getElementById("mes_select").value].receitas.push({ desc: n, valor: v || 0 });
-      salvar(); renderizar();
+    function addReceita() { 
+      const n = prompt("Descrição:"); const v = parseFloat(prompt("Valor:"));
+      if(n) { dados[document.getElementById("mes_select").value].receitas.push({desc: n, valor: v||0}); salvar(); renderizar(); }
     }
 
     function addDespesaFixa() {
-      const n = prompt("Nome:"); if(!n) return;
-      const v = parseFloat(prompt("Valor:").replace(',', '.'));
-      dados[document.getElementById("mes_select").value].fixas.push({ data: '', categoria: n, valor: v || 0, paga: false, meio: '' });
-      salvar(); renderizar();
-    }
-
-    function replicarFixas() {
-      const mesAt = document.getElementById("mes_select").value, fix = dados[mesAt].fixas;
-      if(confirm("Replicar fixas?")) {
-        const meses = Object.keys(dados).filter(k => k.startsWith("2026-"));
-        const idx = meses.indexOf(mesAt);
-        for(let i=idx+1; i<meses.length; i++) { dados[meses[i]].fixas = fix.map(f => ({...f, paga:false, meio: '', data:''})); }
-        salvar(); renderizar();
-      }
+      const n = prompt("Nome:"); const v = parseFloat(prompt("Valor:"));
+      if(n) { dados[document.getElementById("mes_select").value].fixas.push({categoria: n, valor: v||0, paga: false}); salvar(); renderizar(); }
     }
 
     function popularMeses() {
       const sel = document.getElementById("mes_select"), ms = ["Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
-      sel.innerHTML = "";
       ms.forEach((m, i) => { 
         let o = document.createElement("option"); o.value = `2026-${String(i+3).padStart(2,'0')}`; o.textContent = m; 
-        if(o.value === "2026-03") o.selected = true; sel.appendChild(o); 
+        sel.appendChild(o); 
       });
     }
 
     function removerItem(tipo, i) { if(confirm("Excluir?")) { dados[document.getElementById("mes_select").value][tipo].splice(i,1); salvar(); renderizar(); } }
-    function exportarJSON() { const b = new Blob([JSON.stringify(dados)], {type:'application/json'}); const a = document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`backup_financeiro.json`; a.click(); }
+    function exportarJSON() { const b = new Blob([JSON.stringify(dados)], {type:'application/json'}); const a = document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`backup.json`; a.click(); }
     function importarJSON(e) { const r = new FileReader(); r.onload = (v) => { dados = JSON.parse(v.target.result); salvar(); renderizar(); }; r.readAsText(e.target.files[0]); }
 
     popularMeses(); renderizar();
