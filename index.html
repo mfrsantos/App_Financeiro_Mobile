@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Finanças Mobile v1.7.6</title>
+  <title>Finanças Mobile v1.7.7</title>
   
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#3b82f6">
@@ -11,60 +11,54 @@
   <link rel="apple-touch-icon" href="icon-192.png">
 
   <style>
-    /* Estilos do Botão de Instalação */
-    #btn-instalar-pwa {
-      display: none; /* Escondido por padrão, aparece só se for instalável */
-      background: #10b981;
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: 10px;
-      font-weight: bold;
-      width: 100%;
-      margin-bottom: 15px;
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.02); }
-      100% { transform: scale(1); }
-    }
-
-    /* Resto dos estilos originais */
     * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; touch-action: manipulation; }
     body { margin: 0; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0; background: #121212; color: #e0e0e0; }
     .container { max-width: 1300px; margin: 0 auto; padding: 10px; background: #1e1e1e; min-height: 100vh; }
-    header { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
+    
+    header { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
     .header-top { display: flex; justify-content: space-between; align-items: center; }
-    .header-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     h1 { font-size: 1.1rem; margin: 0; color: #3b82f6; }
+
+    #btn-instalar-pwa {
+      display: none; background: #10b981; color: white; border: none; padding: 12px;
+      border-radius: 10px; font-weight: bold; width: 100%; margin-bottom: 10px;
+    }
+
+    .header-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     button, input, select { min-height: 44px; padding: 8px; border-radius: 10px; border: 1px solid #444; background: #333; color: #fff; font-size: 0.85rem; }
     button { background: #3b82f6; font-weight: 600; border: none; cursor: pointer; }
+
     .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
     .card { padding: 12px; border-radius: 12px; background: #2a2a2a; border-left: 4px solid #3b82f6; }
     .card h2 { margin: 0 0 4px; font-size: 0.65rem; color: #9ca3af; text-transform: uppercase; }
     .card p { margin: 0; font-size: 1rem; font-weight: 800; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-    @media (max-width: 1024px) { .grid { grid-template-columns: 1fr; } }
-    .table-container { width: 100%; overflow-x: auto; border-radius: 10px; background: #242424; }
+
+    .secao { background: #242424; padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #333; }
+    .secao h3 { margin: 0 0 15px 0; font-size: 1rem; color: #3b82f6; display: flex; align-items: center; gap: 8px; }
+
+    .table-container { width: 100%; overflow-x: auto; margin-top: 10px; }
     table { width: 100%; border-collapse: collapse; }
-    th { background: #333; color: #3b82f6; font-size: 0.65rem; padding: 10px 6px; text-align: left; }
-    td { padding: 8px 6px; border-bottom: 1px solid #333; font-size: 0.8rem; }
-    .btn-remover { background: #ef4444; width: 34px; height: 34px; border-radius: 8px; color: white; }
-    #modal-pagamento { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; padding: 20px; }
-    .modal-content { background: #2a2a2a; padding: 25px; border-radius: 15px; width: 100%; max-width: 400px; text-align: center; }
+    th { background: #1a1a1a; color: #9ca3af; font-size: 0.6rem; text-transform: uppercase; padding: 10px 5px; text-align: left; }
+    td { padding: 10px 5px; border-bottom: 1px solid #333; font-size: 0.85rem; }
+    
+    .badge-meio { font-size: 0.7rem; padding: 2px 6px; border-radius: 5px; font-weight: bold; }
+    .badge-credito { background: #f59e0b22; color: #f59e0b; border: 1px solid #f59e0b44; }
+    .badge-debito { background: #10b98122; color: #10b981; border: 1px solid #10b98144; }
+
+    .btn-remover { background: #ef4444; width: 30px; height: 30px; border-radius: 8px; color: white; line-height: 1; }
+    
+    #modal-pagamento { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; padding: 20px; }
+    .modal-content { background: #2a2a2a; padding: 25px; border-radius: 20px; width: 100%; max-width: 400px; text-align: center; border: 1px solid #444; }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
       <div class="header-top"><h1>💰 Finanças Mobile</h1><select id="mes_select" onchange="renderizar();"></select></div>
-      
       <button id="btn-instalar-pwa" onclick="instalarApp()">📲 INSTALAR APLICATIVO</button>
-
       <div class="header-actions">
-        <button onclick="exportarJSON()">📤 EXPORTAR</button>
-        <button onclick="document.getElementById('input-import').click()">📥 IMPORTAR</button>
+        <button onclick="exportarJSON()" style="background: #4b5563;">📤 EXPORTAR</button>
+        <button onclick="document.getElementById('input-import').click()" style="background: #4b5563;">📥 IMPORTAR</button>
         <input type="file" id="input-import" style="display: none;" onchange="importarJSON(event)">
       </div>
     </header>
@@ -73,65 +67,80 @@
       <div class="card" style="border-left-color: #facc15;"><h2>Receita Bruta</h2><p id="res-bruta">R$ 0,00</p></div>
       <div class="card" style="border-left-color: #3b82f6;"><h2>Saldo Adiant.</h2><p id="res-adiant">R$ 0,00</p></div>
       <div class="card" style="border-left-color: #10b981;"><h2>Saldo Salário</h2><p id="res-salario">R$ 0,00</p></div>
-      <div class="card" style="border-left-color: #f59e0b;"><h2>Fatura Aberta</h2><p id="res-fatura">R$ 0,00</p></div>
+      <div class="card" style="border-left-color: #f59e0b;"><h2>Cartão (Fatura)</h2><p id="res-fatura">R$ 0,00</p></div>
     </section>
 
-    <div class="grid">
-      <div class="secao"><h3>💵 Receitas</h3><button style="width:100%; margin-bottom:10px;" onclick="addReceita()">+ Receita</button>
-        <div class="table-container"><table><thead><tr><th>Desc.</th><th>Valor</th><th></th></tr></thead><tbody id="tabela-receitas"></tbody></table></div>
-      </div>
-      <div class="secao"><h3>📋 Fixas</h3><button style="width:100%; margin-bottom:10px;" onclick="addDespesaFixa()">+ Fixa</button>
-        <div class="table-container"><table><thead><tr><th>OK</th><th>Desc.</th><th>Valor</th><th>Meio</th><th></th></tr></thead><tbody id="tabela-fixas"></tbody></table></div>
+    <div class="secao">
+      <h3>💵 Entradas / Receitas</h3>
+      <button style="width:100%; margin-bottom:10px;" onclick="addReceita()">+ Nova Receita</button>
+      <div class="table-container">
+        <table>
+          <thead><tr><th>Descrição</th><th>Valor</th><th style="width:40px;"></th></tr></thead>
+          <tbody id="tabela-receitas"></tbody>
+        </table>
       </div>
     </div>
 
-    <section style="margin-top: 25px; padding-bottom: 60px;">
-      <h3>🛒 Variáveis</h3>
-      <div style="background: #2a2a2a; padding: 15px; border-radius: 12px; display: flex; flex-direction: column; gap: 10px;">
-        <input type="date" id="var-data"><input type="text" id="var-desc" placeholder="Descrição"><input type="number" id="var-valor" placeholder="R$ 0,00">
+    <div class="secao">
+      <h3>📋 Contas Fixas (Mensais)</h3>
+      <button style="width:100%; margin-bottom:10px; background: #8b5cf6;" onclick="addDespesaFixa()">+ Nova Conta Fixa</button>
+      <div class="table-container">
+        <table>
+          <thead><tr><th>Status</th><th>Descrição</th><th>Valor</th><th>Meio</th><th></th></tr></thead>
+          <tbody id="tabela-fixas"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="secao">
+      <h3>🛒 Gastos Variáveis / Diários</h3>
+      <div style="background: #1a1a1a; padding: 12px; border-radius: 10px; margin-bottom: 15px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+          <input type="date" id="var-data">
+          <input type="number" id="var-valor" placeholder="R$ 0,00" inputmode="decimal">
+        </div>
+        <input type="text" id="var-desc" placeholder="Onde gastou?" style="width: 100%; margin-bottom: 8px;">
         <div style="display: flex; gap: 8px;">
-          <select id="var-meio" style="flex: 1;"><option value="debito">💰 Débito</option><option value="credito">💳 Crédito</option></select>
-          <button onclick="addVariavel()" style="flex: 1;">Salvar</button>
+          <select id="var-meio" style="flex: 1;"><option value="debito">💰 Débito / Pix</option><option value="credito">💳 Cartão Crédito</option></select>
+          <button onclick="addVariavel()" style="flex: 1; background: #10b981;">Salvar Gasto</button>
         </div>
       </div>
-      <div class="table-container" style="margin-top: 10px;"><table><tbody id="tabela-variaveis-body"></tbody></table></div>
-    </section>
+      <div class="table-container">
+        <table>
+          <thead><tr><th>Data</th><th>Descrição</th><th>Valor</th><th></th></tr></thead>
+          <tbody id="tabela-variaveis-body"></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
-  <div id="modal-pagamento"><div class="modal-content"><h3>Pagamento</h3><div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"><button onclick="processarEscolha('credito')">💳 CRÉDITO</button><button onclick="processarEscolha('debito')">💰 DÉBITO</button></div></div></div>
+  <div id="modal-pagamento">
+    <div class="modal-content">
+      <h3>Confirmar Pagamento</h3>
+      <p style="font-size: 0.9rem; color: #9ca3af; margin-bottom: 20px;">Como esta conta foi paga?</p>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <button onclick="processarEscolha('credito')" style="background: #f59e0b;">💳 CRÉDITO</button>
+        <button onclick="processarEscolha('debito')" style="background: #10b981;">💰 DÉBITO</button>
+      </div>
+      <button onclick="document.getElementById('modal-pagamento').style.display='none'" style="background:transparent; margin-top:15px; color:#9ca3af;">Cancelar</button>
+    </div>
+  </div>
 
   <script>
-    // --- LÓGICA DE INSTALAÇÃO ---
+    // LÓGICA PWA
     let servicoInstalacao;
-    const btnInstalar = document.getElementById('btn-instalar-pwa');
-
     window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      servicoInstalacao = e; // Guarda o evento
-      btnInstalar.style.display = 'block'; // Mostra o botão
+      e.preventDefault(); servicoInstalacao = e;
+      document.getElementById('btn-instalar-pwa').style.display = 'block';
     });
-
     async function instalarApp() {
       if (!servicoInstalacao) return;
-      servicoInstalacao.prompt(); // Abre a janelinha do Chrome
+      servicoInstalacao.prompt();
       const { outcome } = await servicoInstalacao.userChoice;
-      if (outcome === 'accepted') {
-        btnInstalar.style.display = 'none';
-      }
+      if (outcome === 'accepted') document.getElementById('btn-instalar-pwa').style.display = 'none';
       servicoInstalacao = null;
     }
 
-    window.addEventListener('appinstalled', () => {
-      btnInstalar.style.display = 'none';
-      alert("Aplicativo instalado com sucesso!");
-    });
-
-    // --- SERVICE WORKER ---
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js').catch(err => console.log(err));
-    }
-
-    // --- RESTO DO SEU CÓDIGO ORIGINAL ---
     const STORAGE_KEY = "App_Financeiro_Mobile_Data";
     let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || inicializar();
     let itemSelecionadoIdx = null;
@@ -140,32 +149,41 @@
       const base = { config: { limiteCartao: 0 } };
       for (let m = 3; m <= 12; m++) {
         const id = `2026-${String(m).padStart(2, '0')}`;
-        base[id] = { receitas: [{desc: "Adiantamento", valor: 0}, {desc: "Salário", valor: 0}], fixas: [], variaveis: [], pagamentosFatura: [] };
+        base[id] = { receitas: [{desc: "Adiantamento", valor: 0}, {desc: "Salário", valor: 0}], fixas: [], variaveis: [] };
       }
       return base;
     }
 
-    function formatarMoeda(v) { return Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
     function salvar() { localStorage.setItem(STORAGE_KEY, JSON.stringify(dados)); atualizarResumo(); }
+    function formatarMoeda(v) { return Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
 
     function renderizar() {
       const mes = document.getElementById("mes_select").value;
       const info = dados[mes] || { receitas: [], fixas: [], variaveis: [] };
       
+      // Render Receitas
       document.getElementById("tabela-receitas").innerHTML = info.receitas.map((r, i) => `
-        <tr><td>${r.desc}</td><td><input type="number" class="input-tabela" value="${r.valor.toFixed(2)}" onchange="dados['${mes}'].receitas[${i}].valor=parseFloat(this.value)||0;salvar()"></td>
+        <tr><td>${r.desc}</td><td><input type="number" step="0.01" class="input-tabela" style="width:80px; background:transparent; border:1px solid #444; color:white; border-radius:5px;" value="${r.valor.toFixed(2)}" onchange="dados['${mes}'].receitas[${i}].valor=parseFloat(this.value)||0;salvar()"></td>
         <td><button onclick="removerItem('receitas', ${i})" class="btn-remover">×</button></td></tr>`).join('');
 
+      // Render Fixas
       document.getElementById("tabela-fixas").innerHTML = info.fixas.map((f, i) => `
         <tr style="${f.paga ? 'opacity: 0.5' : ''}">
           <td><input type="checkbox" ${f.paga ? 'checked' : ''} onchange="abrirModalPagamento(${i}, this.checked)"></td>
-          <td>${f.categoria}</td><td>${f.valor.toFixed(2)}</td><td>${f.meio === 'credito' ? '💳' : '💰'}</td>
+          <td style="font-weight:500;">${f.categoria}</td>
+          <td>${formatarMoeda(f.valor)}</td>
+          <td>${f.paga ? `<span class="badge-meio ${f.meio==='credito'?'badge-credito':'badge-debito'}">${f.meio==='credito'?'💳 CRÉD':'💰 DÉB'}</span>` : '⏳'}</td>
           <td><button onclick="removerItem('fixas', ${i})" class="btn-remover">×</button></td>
         </tr>`).join('');
 
+      // Render Variáveis
       document.getElementById("tabela-variaveis-body").innerHTML = (info.variaveis || []).map((v, i) => `
-        <tr><td>${v.data.split('-')[2]}</td><td>${v.meio==='credito'?'💳':'💰'} ${v.descricao}</td><td>${formatarMoeda(v.valor)}</td>
-        <td><button onclick="removerItem('variaveis', ${i})" class="btn-remover">×</button></td></tr>`).join('');
+        <tr>
+          <td style="color:#9ca3af; font-size:0.7rem;">${v.data.split('-')[2]}/${v.data.split('-')[1]}</td>
+          <td><span style="margin-right:5px;">${v.meio==='credito'?'💳':'💰'}</span>${v.descricao}</td>
+          <td style="font-weight:bold; color:${v.meio==='credito'?'#f59e0b':'#10b981'};">${formatarMoeda(v.valor)}</td>
+          <td><button onclick="removerItem('variaveis', ${i})" class="btn-remover">×</button></td>
+        </tr>`).join('');
       
       atualizarResumo();
     }
@@ -174,11 +192,13 @@
       const mes = document.getElementById("mes_select").value;
       const info = dados[mes];
       let bruta = 0, vAdiant = 0, vSal = 0, fatura = 0, pAdiant = 0, pSal = 0;
+      
       info.receitas.forEach(r => { 
         bruta += r.valor; 
         if (r.desc.toLowerCase().includes("adiant")) vAdiant += r.valor; 
         else if (r.desc.toLowerCase().includes("salari")) vSal += r.valor;
       });
+
       [...info.fixas, ...info.variaveis].forEach(item => {
         if (item.meio === 'credito') fatura += item.valor;
         else if (item.paga || item.meio === 'debito') {
@@ -186,6 +206,7 @@
           if (dia <= 15) pAdiant += item.valor; else pSal += item.valor;
         }
       });
+
       document.getElementById("res-bruta").textContent = formatarMoeda(bruta);
       document.getElementById("res-adiant").textContent = formatarMoeda(vAdiant - pAdiant);
       document.getElementById("res-salario").textContent = formatarMoeda(vSal - pSal);
@@ -195,6 +216,7 @@
     function abrirModalPagamento(idx, isChecked) {
       if (!isChecked) {
         dados[document.getElementById("mes_select").value].fixas[idx].paga = false;
+        dados[document.getElementById("mes_select").value].fixas[idx].meio = "";
         salvar(); renderizar(); return;
       }
       itemSelecionadoIdx = idx;
@@ -204,8 +226,10 @@
     function processarEscolha(meio) {
       const mes = document.getElementById("mes_select").value;
       const item = dados[mes].fixas[itemSelecionadoIdx];
-      item.meio = meio; item.paga = true;
-      if(meio === 'debito') item.data = `${mes}-${prompt("Dia:", "10")}`;
+      item.meio = meio;
+      item.paga = true;
+      if(meio === 'debito') item.data = `${mes}-${prompt("Dia do pagamento (01-31):", new Date().getDate())}`;
+      else item.data = `${mes}-01`;
       document.getElementById("modal-pagamento").style.display = "none";
       salvar(); renderizar();
     }
@@ -216,33 +240,36 @@
       const desc = document.getElementById("var-desc").value;
       const valor = parseFloat(document.getElementById("var-valor").value);
       const meio = document.getElementById("var-meio").value;
-      if (!data || isNaN(valor)) return alert("Dados incompletos");
+      if (!data || isNaN(valor) || !desc) return alert("Preencha Data, Descrição e Valor!");
       dados[mes].variaveis.push({ data, descricao: desc, valor, meio });
+      document.getElementById("var-desc").value = ""; document.getElementById("var-valor").value = "";
       salvar(); renderizar();
     }
 
     function addReceita() { 
-      const n = prompt("Descrição:"); const v = parseFloat(prompt("Valor:"));
+      const n = prompt("Descrição da Receita:"); const v = parseFloat(prompt("Valor:"));
       if(n) { dados[document.getElementById("mes_select").value].receitas.push({desc: n, valor: v||0}); salvar(); renderizar(); }
     }
 
     function addDespesaFixa() {
-      const n = prompt("Nome:"); const v = parseFloat(prompt("Valor:"));
-      if(n) { dados[document.getElementById("mes_select").value].fixas.push({categoria: n, valor: v||0, paga: false}); salvar(); renderizar(); }
+      const n = prompt("Nome da Conta Fixa:"); const v = parseFloat(prompt("Valor:"));
+      if(n) { dados[document.getElementById("mes_select").value].fixas.push({categoria: n, valor: v||0, paga: false, meio: ""}); salvar(); renderizar(); }
     }
 
     function popularMeses() {
       const sel = document.getElementById("mes_select"), ms = ["Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
       ms.forEach((m, i) => { 
         let o = document.createElement("option"); o.value = `2026-${String(i+3).padStart(2,'0')}`; o.textContent = m; 
+        if(o.value === "2026-03") o.selected = true;
         sel.appendChild(o); 
       });
     }
 
-    function removerItem(tipo, i) { if(confirm("Excluir?")) { dados[document.getElementById("mes_select").value][tipo].splice(i,1); salvar(); renderizar(); } }
-    function exportarJSON() { const b = new Blob([JSON.stringify(dados)], {type:'application/json'}); const a = document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`backup.json`; a.click(); }
-    function importarJSON(e) { const r = new FileReader(); r.onload = (v) => { dados = JSON.parse(v.target.result); salvar(); renderizar(); }; r.readAsText(e.target.files[0]); }
+    function removerItem(tipo, i) { if(confirm("Excluir este registro?")) { dados[document.getElementById("mes_select").value][tipo].splice(i,1); salvar(); renderizar(); } }
+    function exportarJSON() { const b = new Blob([JSON.stringify(dados)], {type:'application/json'}); const a = document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`backup_financeiro_${new Date().toISOString().slice(0,10)}.json`; a.click(); }
+    function importarJSON(e) { const r = new FileReader(); r.onload = (v) => { try { dados = JSON.parse(v.target.result); salvar(); renderizar(); } catch(err) { alert("Arquivo inválido!"); } }; r.readAsText(e.target.files[0]); }
 
+    if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js'); }
     popularMeses(); renderizar();
   </script>
 </body>
