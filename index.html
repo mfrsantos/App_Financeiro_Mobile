@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>ERP Finanças MS Informática</title>
+  <link rel="manifest" href="manifest.json">
   
   <style>
     * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; touch-action: manipulation; }
@@ -40,6 +41,7 @@
     
     #modal-pagamento { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); align-items: center; justify-content: center; padding: 20px; }
     .modal-content { background: #2a2a2a; padding: 25px; border-radius: 20px; width: 100%; max-width: 400px; text-align: center; border: 1px solid #444; }
+    .modal-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; }
   </style>
 </head>
 <body>
@@ -113,15 +115,21 @@
         </div>
       </div>
     </div>
+
+    <button id="btn-instalar" style="display:none; width:100%; background:#f59e0b; margin-top:20px;" onclick="dispararInstalacaoCustomizada()">📲 INSTALAR ERP NO APARELHO</button>
   </div>
 
   <div id="modal-pagamento">
     <div class="modal-content">
-      <h3 style="color: #3b82f6;">Forma de Pagamento</h3>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-        <button onclick="processarEscolhaFixa('credito')" style="background: #f59e0b; height: 60px;">💳 CRÉDITO</button>
-        <button onclick="processarEscolhaFixa('debito')" style="background: #10b981; height: 60px;">💰 DÉBITO</button>
+      <h3 style="color: #3b82f6; margin-bottom: 5px;">Pagar Conta</h3>
+      <p id="modal-item-nome" style="font-size: 0.8rem; color: #9ca3af; margin-bottom: 15px;"></p>
+      
+      <div class="modal-grid">
+        <button onclick="processarEscolhaFixa('debito')" style="background: #10b981;">💰 SALDO PRINCIPAL (DÉBITO)</button>
+        <button onclick="processarEscolhaFixa('credito')" style="background: #f59e0b;">💳 CARTÃO (CRÉDITO)</button>
+        <button onclick="processarEscolhaFixa('extra')" style="background: #a855f7;">✨ RENDA EXTRA</button>
       </div>
+      
       <button onclick="fecharModal()" style="margin-top: 20px; background: transparent; color: #ef4444; border: 1px solid #ef4444; width: 100%;">Cancelar</button>
     </div>
   </div>
@@ -147,14 +155,17 @@
       const mes = document.getElementById("mes_select").value;
       const info = dados[mes] || inicializar()[mes];
       
-      // Render Fixas
       document.getElementById("lista-fixas").innerHTML = (info.fixas || []).map((f, i) => {
         const dia = f.paga && f.data ? f.data.split('-')[2] : "--";
-        const icone = f.paga ? (f.meio === 'credito' ? '💳' : '💰') : '⏳';
+        let icone = '⏳';
+        if(f.paga) {
+          if(f.meio === 'credito') icone = '💳';
+          else if(f.meio === 'extra') icone = '✨';
+          else icone = '💰';
+        }
         return `<div class="linha-item" style="${f.paga ? 'opacity: 0.6' : ''}"><div class="check-area"><input type="checkbox" ${f.paga ? 'checked' : ''} onchange="abrirModalPagamento(${i}, this.checked)"></div><div class="info-area"><span class="desc-txt">${f.categoria}</span><span class="valor-txt">${formatarMoeda(f.valor)}</span><span class="data-txt">${dia}</span><span class="meio-txt">${icone}</span></div><button onclick="removerItem('fixas', ${i})" class="btn-remover">×</button></div>`;
       }).join('');
 
-      // Render Diversas
       document.getElementById("lista-diversas").innerHTML = (info.variaveis || []).map((v, i) => {
         let icone = '💰'; let cor = '#10b981';
         if(v.meio === 'credito') { icone = '💳'; cor = '#f59e0b'; }
@@ -182,25 +193,29 @@
     }
 
     function abrirModalPagamento(idx, isChecked) {
+      const mes = document.getElementById("mes_select").value;
       if (!isChecked) {
-        const mes = document.getElementById("mes_select").value;
-        dados[mes].fixas[idx].paga = false; dados[mes].fixas[idx].meio = "";
+        dados[mes].fixas[idx].paga = false; 
+        dados[mes].fixas[idx].meio = "";
         salvar(); renderizar(); return;
       }
       itemSelecionadoIdx = idx;
+      document.getElementById("modal-item-nome").textContent = dados[mes].fixas[idx].categoria + " - " + formatarMoeda(dados[mes].fixas[idx].valor);
       document.getElementById("modal-pagamento").style.display = "flex";
     }
 
     function processarEscolhaFixa(meio) {
       const mes = document.getElementById("mes_select").value;
       const item = dados[mes].fixas[itemSelecionadoIdx];
-      item.meio = meio; item.paga = true;
+      item.meio = meio; 
+      item.paga = true;
       const diaInput = prompt("Dia do pagamento:", new Date().getDate());
       item.data = `${mes}-${String(diaInput||new Date().getDate()).padStart(2,'0')}`;
       fecharModal(); salvar(); renderizar();
     }
 
     function fecharModal() { document.getElementById("modal-pagamento").style.display = "none"; renderizar(); }
+    
     function addReceita() { const n = prompt("Nome da Receita:"); if(n) { dados[document.getElementById("mes_select").value].receitas.push({desc:n, valor:0.00}); salvar(); renderizar(); }}
     function addDespesaFixa() { const n = prompt("Nome:"); const v = prompt("Valor:"); if(n) { dados[document.getElementById("mes_select").value].fixas.push({categoria: n, valor: parseFloat(v?.replace(',','.')) || 0.00, paga: false }); salvar(); renderizar(); } }
     
@@ -210,7 +225,7 @@
       dados[mes].variaveis.push({ data: d, descricao: desc||"Diversos", valor: v, meio: m });
       document.getElementById("var-desc").value = ""; document.getElementById("var-valor").value = ""; salvar(); renderizar();
     }
-    
+
     function registrarPagamentoFatura() {
       const mes = document.getElementById("mes_select").value, d = document.getElementById("ant-data").value, v = parseFloat(document.getElementById("ant-valor").value);
       if(!d || isNaN(v)) return;
@@ -218,6 +233,8 @@
       dados[mes].pagamentosFatura.push({ data: d, valor: v }); salvar(); renderizar();
     }
 
+    function removerItem(t, i) { if(confirm("Remover este item?")) { dados[document.getElementById("mes_select").value][t].splice(i,1); salvar(); renderizar(); } }
+    function removerPagamentoFatura(idx) { if(confirm("Remover?")) { dados[document.getElementById("mes_select").value].pagamentosFatura.splice(idx, 1); salvar(); renderizar(); } }
     function exportarJSON() { const b = new Blob([JSON.stringify(dados)], {type:'application/json'}); const a = document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`ERP_MS_Financas_Backup.json`; a.click(); }
     function importarJSON(e) { const r = new FileReader(); r.onload = (v) => { try { dados = JSON.parse(v.target.result); salvar(); renderizar(); } catch(err) { alert("Arquivo inválido!"); } }; r.readAsText(e.target.files[0]); }
     
@@ -229,9 +246,6 @@
         if(i+3 === mesAtual) o.selected = true; sel.appendChild(o);
       });
     }
-    
-    function removerItem(t, i) { if(confirm("Remover este item?")) { dados[document.getElementById("mes_select").value][t].splice(i,1); salvar(); renderizar(); } }
-    function removerPagamentoFatura(idx) { if(confirm("Remover?")) { dados[document.getElementById("mes_select").value].pagamentosFatura.splice(idx, 1); salvar(); renderizar(); } }
 
     function atualizarResumo() {
       const mes = document.getElementById("mes_select").value;
@@ -279,6 +293,31 @@
     }
 
     popularMeses(); renderizar();
+
+    // SERVICE WORKER & INSTALAÇÃO
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('ERP MS Informática: Ativo'))
+          .catch(err => console.error(err));
+      });
+    }
+
+    let deferredPrompt;
+    const btnInstalar = document.getElementById('btn-instalar');
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault(); deferredPrompt = e;
+      btnInstalar.style.display = 'block';
+    });
+
+    async function dispararInstalacaoCustomizada() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') btnInstalar.style.display = 'none';
+        deferredPrompt = null;
+      }
+    }
   </script>
 </body>
 </html>
