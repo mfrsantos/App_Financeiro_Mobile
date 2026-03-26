@@ -1,5 +1,5 @@
 // ERP Finanças MS Informática - Service Worker
-// Versão: 1.9.7 (Atualizado em Março/2026)
+// Versão: 1.9.8 (Atualizado em Março/2026)
 // Suporte para: Renda Extra em Contas Fixas e PWA Automático
 
 const CACHE_NAME = 'erp-ms-financas-v1.9.7';
