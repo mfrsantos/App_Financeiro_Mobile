@@ -1,4 +1,4 @@
-//Update Versão 1.7.6 - Botão Instalar
+//Update Versão 1.7.7 - Correção tabelas fixas e variaveis
 const CACHE_NAME = 'finance-app-v1.7.4';
 const ASSETS = [
   './',
